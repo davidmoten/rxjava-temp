@@ -37,6 +37,12 @@
 			<artifactId>rxjava</artifactId>
 			<version>${rxjava.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.github.davidmoten</groupId>
+			<artifactId>rxjava-extras</artifactId>
+			<version>0.5.8</version>
+		</dependency>
+		
 
 		<!-- Test Dependencies -->
 		<dependency>
