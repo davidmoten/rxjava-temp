@@ -9,6 +9,7 @@ import rx.Observable.Transformer;
 import rx.Observer;
 import rx.functions.Action2;
 import rx.functions.Func0;
+import rx.functions.Func2;
 import rx.functions.Func3;
 
 import com.github.davidmoten.rx.Transformers;
@@ -17,13 +18,16 @@ public class Main {
     public static void main(String[] args) throws InterruptedException {
         Observable<Integer> source = just(1, 1, 1, 2, 2, 3);
 
-        Func0<List<Integer>> initialState = () -> Collections.emptyList();
+        List<List<Integer>> lists = source.compose(toListUntilChanged((a, b) -> a.equals(b)))
+                .toList().toBlocking().single();
+        System.out.println(lists);
+    }
 
-        Func3<List<Integer>, Integer, Observer<List<Integer>>, List<Integer>> transition = (list,
-                n, observer) -> {
-            if (list.size() == 0)
-                return add(list, n);
-            else if (list.get(0).equals(n)) {
+    public static <T> Transformer<T, List<T>> toListUntilChanged(Func2<T, T, Boolean> together) {
+        Func0<List<T>> initialState = () -> Collections.emptyList();
+
+        Func3<List<T>, T, Observer<List<T>>, List<T>> transition = (list, n, observer) -> {
+            if (list.size() == 0 || together.call(list.get(list.size() - 1), n)) {
                 return add(list, n);
             } else {
                 observer.onNext(list);
@@ -31,15 +35,12 @@ public class Main {
             }
 
         };
-        Action2<List<Integer>, Observer<List<Integer>>> completionAction = (list, observer) -> {
+        Action2<List<T>, Observer<List<T>>> completionAction = (list, observer) -> {
             if (list.size() > 0) {
                 observer.onNext(list);
             }
         };
-        Transformer<Integer, List<Integer>> transformer = Transformers
-                .<List<Integer>, Integer, List<Integer>> stateMachine(initialState, transition,
-                        completionAction);
-        System.out.println(source.compose(transformer).toList().toBlocking().single());
+        return Transformers.stateMachine(initialState, transition, completionAction);
     }
 
     private static <T> List<T> add(List<T> list, T item) {
