@@ -13,7 +13,7 @@ public class Main {
                 // .doOnRequest(n -> System.out.println("requested a " + n)) //
                 .subscribeOn(Schedulers.io()) //
                 // .subscribeOn(Schedulers.io()) //
-                .observeOn(Schedulers.io()) //
+                .subscribeOn(Schedulers.io()) //
         // .doOnRequest(n -> System.out.println("requested m " + n)) //
         ; //
         o.doOnNext(System.out::println) //
