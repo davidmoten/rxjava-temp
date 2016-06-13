@@ -12,12 +12,14 @@ public class Main {
                 .onBackpressureBuffer() //
                 // .doOnRequest(n -> System.out.println("requested a " + n)) //
                 .subscribeOn(Schedulers.io()) //
-                .subscribeOn(Schedulers.io()) //
+                // .subscribeOn(Schedulers.io()) //
+                .observeOn(Schedulers.io()) //
         // .doOnRequest(n -> System.out.println("requested m " + n)) //
         ; //
         o.doOnNext(System.out::println) //
+                .take(1000) //
                 .count() //
-                .timeout(5, TimeUnit.SECONDS) //
+                .timeout(3, TimeUnit.SECONDS) //
                 .toBlocking().single();
     }
 }
